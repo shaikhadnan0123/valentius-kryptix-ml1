@@ -1,0 +1,71 @@
+{
+  "dataset": "Telco Customer Churn (7043 rows, 19 features)",
+  "split": {
+    "test_size": 0.2,
+    "random_state": 42,
+    "stratified": true
+  },
+  "ranked_by": "F1 (churn class)",
+  "results": [
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.8069552874378992,
+      "Precision": 0.660377358490566,
+      "Recall": 0.5614973262032086,
+      "F1": 0.6069364161849711,
+      "ROC-AUC": 0.8421710713270816,
+      "CV F1 (train, 5-fold)": 0.5925628053210671,
+      "CV F1 std": 0.030315136278580224
+    },
+    {
+      "Model": "K-Nearest Neighbors",
+      "Accuracy": 0.78708303761533,
+      "Precision": 0.6039325842696629,
+      "Recall": 0.5748663101604278,
+      "F1": 0.589041095890411,
+      "ROC-AUC": 0.828094241649229,
+      "CV F1 (train, 5-fold)": 0.594765489709341,
+      "CV F1 std": 0.014977996118655267
+    },
+    {
+      "Model": "Random Forest",
+      "Accuracy": 0.794180269694819,
+      "Precision": 0.6381578947368421,
+      "Recall": 0.5187165775401069,
+      "F1": 0.5722713864306784,
+      "ROC-AUC": 0.8272417267302177,
+      "CV F1 (train, 5-fold)": 0.546348285735853,
+      "CV F1 std": 0.02720609224973492
+    },
+    {
+      "Model": "Naive Bayes",
+      "Accuracy": 0.6557842441447835,
+      "Precision": 0.4268774703557312,
+      "Recall": 0.8663101604278075,
+      "F1": 0.5719329214474845,
+      "ROC-AUC": 0.8092355782892867,
+      "CV F1 (train, 5-fold)": 0.58220324905183,
+      "CV F1 std": 0.010265405888086887
+    },
+    {
+      "Model": "Support Vector Machine",
+      "Accuracy": 0.7927608232789212,
+      "Precision": 0.6496350364963503,
+      "Recall": 0.47593582887700536,
+      "F1": 0.5493827160493827,
+      "ROC-AUC": 0.7927665400811179,
+      "CV F1 (train, 5-fold)": 0.5697895872370623,
+      "CV F1 std": 0.015957582656987424
+    },
+    {
+      "Model": "Decision Tree",
+      "Accuracy": 0.7260468417317246,
+      "Precision": 0.4837837837837838,
+      "Recall": 0.4786096256684492,
+      "F1": 0.48118279569892475,
+      "ROC-AUC": 0.6465305226174791,
+      "CV F1 (train, 5-fold)": 0.5026516298093971,
+      "CV F1 std": 0.023449509562192185
+    }
+  ]
+}
