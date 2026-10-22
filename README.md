@@ -1,8 +1,9 @@
-# Supervised Machine Learning Benchmark & Algorithms from Scratch
+# Machine Learning Benchmark, Algorithms from Scratch & Unsupervised Learning
 
-A comprehensive machine learning repository containing two key empirical studies:
+A comprehensive machine learning repository containing three key empirical studies:
 1. **Supervised Learning Benchmark: Comparative Study of 6 Classification Algorithms** — evaluated on the **Telco Customer Churn** dataset under identical split, preprocessing, and evaluation pipeline conditions.
 2. **Linear Regression from Scratch with NumPy** — vectorized implementation of hypothesis, Mean Squared Error (MSE) cost function, and gradient descent on the **California Housing** dataset, mathematically verified against `scikit-learn`.
+3. **Unsupervised Learning: K-Means + PCA** — cluster discovery and 2D visualization on the **Wine** dataset (13 chemical features, labels hidden), with k chosen via elbow and silhouette analysis.
 
 ---
 
@@ -17,6 +18,11 @@ A comprehensive machine learning repository containing two key empirical studies
   - [1. Mathematical Formulation](#1-mathematical-formulation)
   - [2. Vectorized Gradient Derivation](#2-vectorized-gradient-derivation)
   - [3. Validation against Scikit-Learn](#3-validation-against-scikit-learn)
+- [Unsupervised Learning: K-Means + PCA](#unsupervised-learning-k-means--pca)
+  - [1. Dataset & Preprocessing](#1-dataset--preprocessing)
+  - [2. Choosing k](#2-choosing-k)
+  - [3. PCA & Explained Variance](#3-pca--explained-variance)
+  - [4. Cluster Interpretation](#4-cluster-interpretation)
 - [Repository Structure](#repository-structure)
 - [Installation & Reproduction](#installation--reproduction)
 - [Future Enhancements](#future-enhancements)
@@ -152,6 +158,56 @@ The custom implementation was trained on the **California Housing** dataset (20,
 
 ---
 
+## Unsupervised Learning: K-Means + PCA
+
+An unsupervised pipeline that finds and visualizes structure in the **Wine** dataset *without using the labels*. Full write-up: [`unsupervised-learning/README.md`](unsupervised-learning/README.md). Code: [`unsupervised-learning/pipeline.py`](unsupervised-learning/pipeline.py).
+
+### 1. Dataset & Preprocessing
+
+`sklearn.datasets.load_wine` — 178 wines, 13 numeric chemical features (alcohol, flavanoids, proline, color intensity, etc.). The 3-cultivar `target` was dropped and **never used for fitting**; it was consulted only afterwards as a sanity check. Features are standardized with `StandardScaler` because scales differ enormously (proline ~1000 vs. hue ~1), which would otherwise dominate K-Means' distance calculation.
+
+### 2. Choosing k
+
+K-Means (`n_init=10`, `random_state=42`) was run for k = 2–10:
+
+| k | Inertia | Silhouette |
+|---:|---:|---:|
+| 2 | 1658.8 | 0.259 |
+| **3** | **1277.9** | **0.285** |
+| 4 | 1175.4 | 0.260 |
+| 5 | 1109.5 | 0.202 |
+| 6 | 1046.0 | 0.237 |
+
+![Elbow & Silhouette](unsupervised-learning/figures/elbow_silhouette.png)
+
+**k = 3** has the highest silhouette and the largest inertia drop (k=2→3: −381, then only −103 and −66). The elbow is gentle and the silhouette is modest (0.285), so clusters are meaningful but overlap somewhat.
+
+### 3. PCA & Explained Variance
+
+| Component | Explained Variance Ratio |
+|---|---:|
+| PC1 | 36.2% |
+| PC2 | 19.2% |
+| **Total (2D)** | **55.4%** |
+
+The 2D projection retains ~55% of the original variance; the other ~45% is lost, so some visual overlap is a projection artifact.
+
+![PCA Clusters](unsupervised-learning/figures/pca_clusters.png)
+
+### 4. Cluster Interpretation
+
+| Cluster | n | Profile (z-score highlights) |
+|---|---:|---|
+| 0 | 65 | **Light, low-alcohol, pale wines** — lowest alcohol (−0.93) and color intensity (−0.90), low proline |
+| 1 | 51 | **Dark, acidic, low-phenol wines** — highest malic acid (+0.87) and color (+0.94); lowest flavanoids (−1.22) and hue (−1.16) |
+| 2 | 62 | **Full-bodied, phenol-rich wines** — highest alcohol (+0.84), proline (+1.13), flavanoids (+0.98) |
+
+PC1 is essentially a *phenolic richness* axis (flavanoids, total phenols, OD280) and PC2 an *intensity* axis (color intensity, alcohol, proline). As a post-hoc check, the clusters match the three real grape cultivars (Adjusted Rand Index = **0.897**), meaning K-Means recovered the cultivar structure from chemistry alone.
+
+**Limitations:** modest silhouette; 2D PCA keeps only 55% of variance; K-Means assumes roughly spherical, similarly-sized clusters.
+
+---
+
 ## Repository Structure
 
 ```
@@ -166,6 +222,14 @@ The custom implementation was trained on the **California Housing** dataset (20,
 │   ├── f1_ranking.png                # F1-score ranking visualization
 │   ├── roc_curves.png                # Combined ROC curves plot
 │   └── confusion_matrices.png        # 6-panel confusion matrices
+├── unsupervised-learning/
+│   ├── pipeline.py                   # K-Means + PCA pipeline (Wine dataset)
+│   ├── README.md                     # Detailed unsupervised write-up
+│   ├── cluster_profiles.csv          # Mean feature values per cluster
+│   ├── run_output.txt                # Console output of the run
+│   └── figures/
+│       ├── elbow_silhouette.png      # Elbow + silhouette analysis
+│       └── pca_clusters.png          # PCA scatter colored by cluster
 ├── main.py                           # Classification pipeline & benchmark script
 ├── linear_regression_scratch.ipynb   # From-scratch Linear Regression implementation
 ├── cost_convergence.png              # Gradient descent convergence graph
@@ -202,6 +266,12 @@ The custom implementation was trained on the **California Housing** dataset (20,
    jupyter notebook linear_regression_scratch.ipynb
    ```
 
+5. **Run the Unsupervised Learning Pipeline:**
+   ```bash
+   python unsupervised-learning/pipeline.py
+   ```
+   *Figures are written to `unsupervised-learning/figures/` (created automatically).*
+
 ---
 
 ## Future Enhancements
@@ -210,3 +280,4 @@ The custom implementation was trained on the **California Housing** dataset (20,
 - Hyperparameter tuning (`GridSearchCV`) for SVM ($C, \gamma$), Decision Tree depth/pruning, and KNN $k$.
 - Benchmark Gradient Boosting models (`XGBoost`, `LightGBM`, `CatBoost`).
 - Introduce cost-sensitive matrix evaluation to weigh False Negatives (lost churners) against False Positives (retention discounts).
+- Compare K-Means against Gaussian Mixture Models and hierarchical clustering, and try t-SNE/UMAP for non-linear visualization.
